@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 
 module.exports = mongoose.model(
-    "entrySchema",
+    "dataSchema",
     mongoose.Schema(
         {
+            login: String,
+            password: String,
             strongDays: [String],
             notStrongDays: [String]
         },
