@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./schemas/dataSchema')
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const dataSchema = require('./schemas/dataSchema');
 
 const connection = mongoose.connect("mongodb+srv://admin:!EotU322@cluster0.kcwdz.mongodb.net/calendar").then(err => {
     try {
@@ -26,7 +27,8 @@ app.post("/registration", async (req, res) => {
         res.status(400).send({ error: "User has been verify resently" });
     }
     // creating a new mongoose doc from user data
-    const user = new User(req.body);
+    const token = generateAccessToken({ username: req.body.login });
+    const user = new User({login: req.body.login, password: req.body.password, token: token});
     // generate salt to hash password
     const salt = await bcrypt.genSalt(10);
     // now we set user password to hashed password
@@ -40,7 +42,7 @@ app.post("/login", async (req, res) => {
     if (user) {
       const validPassword = await bcrypt.compare(req.body.password, user.password);
       if (validPassword) {
-        const token = generateAccessToken({ username: req.body.login });
+        const token = user.token;
         res.status(200).json({ message: "Valid password", token: token });
       } else {
         res.status(400).json({ error: "Invalid Password" });
@@ -50,18 +52,23 @@ app.post("/login", async (req, res) => {
     }
 })
 
-app.get("getData", async (req, res) => {
+app.post("/submitData", async (req, res) => {
     try {
-        res.status(200).json({ hardDays: req.body.hardDays , notHardDays: req.body.notHardDays })
-    } catch (error) {
-        console.log(error);
+        const user = await User.findOne({ token: req.body.token });
+        await dataSchema.updateOne({user}, {strongDays: req.body.hardDays , notStrongDays: req.body.notHardDays})
+        res.status(200).json({ message: "Success, data was updated" })
+        console.log(user);
+    } catch (err) {
+        res.status(400).json({ error: err });
+        console.log("Alllooooo")
     }
 
 })
 
-app.post("/submitData", async (req, res) => {
+app.get("getData", async (req, res) => {
     try {
-        res.status(200).json({ hardDays: req.body.hardDays , notHardDays: req.body.notHardDays })
+        const user = await User.findOne({ token: req.body.token });
+        res.status(200).json({ hardDays: user.strongDays , notHardDays: user.notStrongDays })
     } catch (error) {
         console.log(error);
     }

@@ -6,6 +6,7 @@ module.exports = mongoose.model(
         {
             login: String,
             password: String,
+            token: String,
             strongDays: [String],
             notStrongDays: [String]
         },
