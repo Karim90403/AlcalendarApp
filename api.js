@@ -33,8 +33,8 @@ app.post("/registration", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     // now we set user password to hashed password
     user.password = await bcrypt.hash(user.password, salt);
-    user.save().then((doc) => res.status(201).send(doc).catch((err) => 
-    res.status(500).send({ error: err.message })));
+    user.save().then((doc) => res.status(201).send(doc)).catch((err) => 
+    res.status(500).send({ error: err.message }));
 })
 
 app.post("/login", async (req, res) => {
@@ -55,22 +55,23 @@ app.post("/login", async (req, res) => {
 app.post("/submitData", async (req, res) => {
     try {
         const user = await User.findOne({ token: req.body.token });
+        console.log(user);
         await dataSchema.updateOne({user}, {strongDays: req.body.hardDays , notStrongDays: req.body.notHardDays})
         res.status(200).json({ message: "Success, data was updated" })
-        console.log(user);
     } catch (err) {
-        res.status(400).json({ error: err });
-        console.log("Alllooooo")
+        res.status(400).json({ error: err.message })
     }
 
 })
 
-app.get("getData", async (req, res) => {
+app.post("/getData", async (req, res) => {
     try {
+        console.log(req.body)
         const user = await User.findOne({ token: req.body.token });
+        console.log(user);
         res.status(200).json({ hardDays: user.strongDays , notHardDays: user.notStrongDays })
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
     }
 
 })

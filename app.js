@@ -4,7 +4,6 @@ const cors = require('cors');
 const api = require('./api');
 const path = require('path');
 const environment = require('dotenv').config()
-console.log(process.env)
 
 const app = express()
 
