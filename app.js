@@ -11,10 +11,9 @@ app.use(express.json())
 app.use(cors())
 
 app.use("/api", api)
-// app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "dist")))
 
 
-app.listen(8023, () => {
-    // console.log(`App ran at ${process.env.PORT}`)
-    console.log("App started")
+app.listen(process.env.PORT, () => {
+    console.log(`App ran at ${process.env.PORT}`)
 })
