@@ -55,7 +55,6 @@ app.post("/login", async (req, res) => {
 app.post("/submitData", async (req, res) => {
     try {
         const user = await User.findOne({ token: req.body.token });
-        console.log(user);
         await dataSchema.updateOne({user}, {strongDays: req.body.hardDays , notStrongDays: req.body.notHardDays})
         res.status(200).json({ message: "Success, data was updated" })
     } catch (err) {
@@ -66,9 +65,7 @@ app.post("/submitData", async (req, res) => {
 
 app.post("/getData", async (req, res) => {
     try {
-        console.log(req.body)
         const user = await User.findOne({ token: req.body.token });
-        console.log(user);
         res.status(200).json({ hardDays: user.strongDays , notHardDays: user.notStrongDays })
     } catch (err) {
         res.status(400).json({ error: err.message });
